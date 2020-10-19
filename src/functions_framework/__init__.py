@@ -88,6 +88,18 @@ def _run_legacy_event(function, request):
     event_data = request.get_json()
     if not event_data:
         flask.abort(400)
+
+    ###############
+    # Need to add this code to make pubsub events work.
+    if 'message' in event_data:
+        if 'data' not in event_data:
+            message = event_data['message']
+            event_data['data'] = {
+                'data': message.get('data'),
+                'attributes': message.get('attributes')
+            }
+    ###############
+
     event_object = _Event(**event_data)
     data = event_object.data
     context = Context(**event_object.context)
